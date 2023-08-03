@@ -1,0 +1,142 @@
+{
+  "name": "high_cpu_usage_on_kubernetes_dns_pods",
+  "description": "This incident type involves a high CPU usage on Kubernetes DNS pods in a test environment. It typically occurs when the average CPU usage exceeds a certain threshold, as indicated by a query alert monitor. This can impact the performance and stability of the Kubernetes cluster and may require investigation and remediation to prevent further issues.",
+  "params": [
+    {
+      "name": "CPU_THRESHOLD",
+      "value": ""
+    },
+    {
+      "name": "POD_NAME",
+      "value": ""
+    },
+    {
+      "name": "NAMESPACE",
+      "value": ""
+    },
+    {
+      "name": "MEMORY_THRESHOLD",
+      "value": ""
+    },
+    {
+      "name": "SELECTOR",
+      "value": ""
+    },
+    {
+      "name": "CONTEXT_NAME",
+      "value": ""
+    },
+    {
+      "name": "INCIDENT_KEYWORD",
+      "value": ""
+    },
+    {
+      "name": "K8S_CLUSTER_NAME",
+      "value": ""
+    }
+  ],
+  "cells": [
+    {
+      "name": "cell_1",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## High CPU Usage on Kubernetes DNS Pods\nThis incident type involves a high CPU usage on Kubernetes DNS pods in a test environment. It typically occurs when the average CPU usage exceeds a certain threshold, as indicated by a query alert monitor. This can impact the performance and stability of the Kubernetes cluster and may require investigation and remediation to prevent further issues."
+    },
+    {
+      "name": "cell_2",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## 1. Check the CPU usage of Kubernetes DNS pods"
+    },
+    {
+      "name": "cell_3",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | limit=1 | random=1 | `kubectl top pods --namespace ${NAMESPACE} --selector ${SELECTOR} # replace ${NAMESPACE} and ${SELECTOR} with appropriate values`"
+    },
+    {
+      "name": "cell_4",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## 2. Check the resource limits and requests of Kubernetes DNS pods"
+    },
+    {
+      "name": "cell_5",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | limit=1 | random=1 | `kubectl describe pods --namespace ${NAMESPACE} --selector ${SELECTOR} | grep -A 5 \"Limits\\|Requests\" # replace ${NAMESPACE} and ${SELECTOR} with appropriate values`"
+    },
+    {
+      "name": "cell_6",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## 3. Check the status of the Kubernetes cluster"
+    },
+    {
+      "name": "cell_7",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | limit=1 | random=1 | `kubectl get nodes # check if any nodes are in NotReady state`"
+    },
+    {
+      "name": "cell_8",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## 4. Check the logs of the Kubernetes DNS pods"
+    },
+    {
+      "name": "cell_9",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | limit=1 | random=1 | `kubectl logs ${POD_NAME} --namespace ${NAMESPACE} # replace ${POD_NAME} and ${NAMESPACE} with appropriate values`"
+    },
+    {
+      "name": "cell_10",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## 5. Check the status of the Kubernetes DNS service"
+    },
+    {
+      "name": "cell_11",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | limit=1 | random=1 | `kubectl describe services coredns --namespace ${NAMESPACE} # replace ${NAMESPACE} with appropriate value`"
+    },
+    {
+      "name": "cell_12",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## 6. Check the CPU usage of the node(s) hosting the Kubernetes DNS pods"
+    },
+    {
+      "name": "cell_13",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | limit=1 | random=1 | `kubectl top nodes # identify the node(s) hosting the pods and check their CPU usage`"
+    },
+    {
+      "name": "cell_14",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## 7. Check the Kubernetes events related to the incident"
+    },
+    {
+      "name": "cell_15",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | limit=1 | random=1 | `kubectl get events --namespace ${NAMESPACE} --sort-by='.metadata.creationTimestamp' | grep -i ${INCIDENT_KEYWORD} # replace ${NAMESPACE} and ${INCIDENT_KEYWORD} with appropriate values`"
+    },
+    {
+      "name": "cell_16",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Optimize the configuration of the DNS pods to reduce their resource consumption and improve efficiency, such as adjusting resource requests and limits, or using a more lightweight DNS solution."
+    },
+    {
+      "name": "cell_17",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "pod | k8s_cluster_name=$K8S_CLUSTER_NAME | app='shoreline' | random=1 | limit=1 | invoke_set_kubectl_context_and_namespace($NAMESPACE, $CONTEXT_NAME)"
+    }
+  ]
+}
